@@ -155,10 +155,24 @@ publicly reachable by URL once the project exists.
 **Verify:** uninvited email can't sign up; invited email gets magic
 link/password flow and lands with a `profiles` row created.
 
-**Onboarding flow (confirmed):** admin invites email → friend clicks link,
-sets password, completes signup → lands logged in → self-serves own API key
-at `/settings/api-keys` (Phase 3 page). No admin key handling needed; admin
-only sends the invite + a link to the onboarding doc (Phase 4b).
+**Onboarding flow (confirmed working, built + tested end-to-end):**
+- Free-tier Supabase can't customize the built-in invite-email template
+  (paid plan or custom SMTP required) — and the default hosted-verify
+  redirect only sets a *browser* session anyway, never a cookie, which
+  `@supabase/ssr`'s server components/proxy actually need. So `npm run
+  invite -- <email> "Name"` (`scripts/invite-friend.ts`) uses the
+  documented `auth.admin.generateLink()` instead of
+  `inviteUserByEmail()` — no email gets sent by Supabase at all. It prints
+  a link for you to send the friend yourself (text/email/whatever).
+- That link hits `src/app/auth/confirm/route.ts`, which verifies the token
+  **server-side** (`auth.verifyOtp`) and writes the session to a cookie —
+  this is the part that has to happen server-side; a client-only
+  hash-token approach was tried first and failed ("Auth session missing!")
+  because the server-rendered pages never saw that session.
+- Friend lands on `/update-password` already signed in (cookie-based),
+  sets a password, done. Same script/link also works for existing
+  unconfirmed users (falls back to `type: recovery` automatically).
+- Self-serves own API key at `/settings/api-keys` (Phase 3) once logged in.
 
 ---
 
@@ -240,7 +254,7 @@ Deliverable: short doc/page handed to each friend alongside their invite,
 so they self-serve the whole agent setup. Two parts:
 
 1. **`ONBOARDING.md`** (or in-app `/docs` page) — human-facing:
-   - accept invite, set password, log in
+   - click the link sent to you (from `npm run invite`), set password, log in
    - go to `/settings/api-keys`, click generate, copy key **(shown once)**
    - set it as an env var for their coding agent, e.g.
      `export IDEAS_API_KEY=sk_...` (name TBD, keep consistent)
