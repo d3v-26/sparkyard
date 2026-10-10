@@ -20,27 +20,46 @@ function useOrigin() {
   );
 }
 
-function CodeBlock({ label, code }: { label: string; code: string }) {
+function SnippetTabs({ items }: { items: { label: string; code: string }[] }) {
+  const [active, setActive] = useState(0);
   const [copied, setCopied] = useState(false);
+  const current = items[active];
   return (
     <div className="border border-line">
-      <div className="flex items-center justify-between border-b border-line px-3 py-1.5 font-mono text-[11px] text-ink-dim">
-        <span>{label}</span>
+      <div className="flex items-center justify-between border-b border-line font-mono text-[11px] text-ink-dim">
+        <div role="tablist" className="flex overflow-x-auto">
+          {items.map((it, i) => (
+            <button
+              key={it.label}
+              type="button"
+              role="tab"
+              aria-selected={i === active}
+              onClick={() => setActive(i)}
+              className={`shrink-0 px-3 py-1.5 ${
+                i === active ? "text-accent" : "hover:text-ink"
+              }`}
+            >
+              {it.label}
+            </button>
+          ))}
+        </div>
         <button
           type="button"
           onClick={async () => {
             try {
-              await navigator.clipboard.writeText(code);
+              await navigator.clipboard.writeText(current.code);
               setCopied(true);
               setTimeout(() => setCopied(false), 1500);
             } catch {}
           }}
-          className="hover:text-accent"
+          className="shrink-0 px-3 py-1.5 hover:text-accent"
         >
           {copied ? "copied" : "copy"}
         </button>
       </div>
-      <pre className="overflow-x-auto px-3 py-3 font-mono text-xs leading-relaxed">{code}</pre>
+      <pre className="overflow-x-auto px-3 py-3 font-mono text-xs leading-relaxed">
+        {current.code}
+      </pre>
     </div>
   );
 }
@@ -64,7 +83,7 @@ function snippets(origin: string, key: string) {
   ${url}`,
     },
     {
-      label: "fetch (Node / JS)",
+      label: "JavaScript",
       code: `await fetch("${url}", {
   method: "POST",
   headers: { "x-api-key": "${key}", "Content-Type": "application/json" },
@@ -77,7 +96,7 @@ function snippets(origin: string, key: string) {
 }).then((r) => r.json());`,
     },
     {
-      label: "Python (requests)",
+      label: "Python",
       code: `import requests
 
 requests.post(
@@ -163,9 +182,7 @@ export default function ApiKeysPage() {
           URL name (the part after the site address, e.g. <code className="font-mono text-ink">sparkyard</code>).
           {!newRawKey && " Generate a key below and it will be filled into these snippets."}
         </p>
-        {snippets(origin, newRawKey ?? "YOUR_API_KEY").map((sn) => (
-          <CodeBlock key={sn.label} label={sn.label} code={sn.code} />
-        ))}
+        <SnippetTabs items={snippets(origin, newRawKey ?? "YOUR_API_KEY")} />
       </div>
 
       {newRawKey && (
