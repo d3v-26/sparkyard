@@ -1,26 +1,94 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  --paper: #f6f1ea;
+  --ink: #1f1b16;
+  --ink-dim: #6b6255;
+  --accent: #c4491d;
+  --accent-ink: #fff7ef;
+  --line: #e4dacb;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --status-new-bg: #e3ecf7;
+  --status-new-fg: #2c5aa0;
+  --status-exploring-bg: #f5e9cf;
+  --status-exploring-fg: #8a5c0a;
+  --status-building-bg: #dcecdf;
+  --status-building-fg: #2f6b3d;
+  --status-archived-bg: #ece7de;
+  --status-archived-fg: #7d7364;
+
+  --source-agent-bg: #efe4f5;
+  --source-agent-fg: #6b3f8a;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --paper: #17130f;
+    --ink: #f3ece2;
+    --ink-dim: #b8ab98;
+    --accent: #e06b3c;
+    --accent-ink: #1b1006;
+    --line: #332a20;
+
+    --status-new-bg: #1e2a3d;
+    --status-new-fg: #8fb3e6;
+    --status-exploring-bg: #362b12;
+    --status-exploring-fg: #e0b558;
+    --status-building-bg: #1c3324;
+    --status-building-fg: #8fcf9f;
+    --status-archived-bg: #2a251d;
+    --status-archived-fg: #b3a893;
+
+    --source-agent-bg: #2c2138;
+    --source-agent-fg: #cba4e8;
   }
 }
 
+@theme inline {
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-ink-dim: var(--ink-dim);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-line: var(--line);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--paper);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 999px;
+  border: 2px solid var(--paper);
+}
+* {
+  scrollbar-color: var(--line) var(--paper);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+code,
+.font-data {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
 }

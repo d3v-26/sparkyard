@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 type ApiKey = {
   id: string;
@@ -60,62 +61,58 @@ export default function ApiKeysPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-xl flex-col gap-6 px-4 py-16">
-      <h1 className="text-2xl font-semibold">API keys</h1>
-      <p className="text-sm text-neutral-500">
+    <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 px-4 py-10">
+      <Link href="/" className="font-mono text-xs text-ink-dim hover:text-accent">
+        ← Sparkyard
+      </Link>
+      <h1 className="text-2xl font-semibold tracking-tight">API keys</h1>
+      <p className="text-sm text-ink-dim">
         Give this key to your own coding agent to post ideas via{" "}
-        <code>POST /api/ideas</code> with an <code>x-api-key</code> header.
+        <code className="font-mono text-ink">POST /api/ideas</code> with an{" "}
+        <code className="font-mono text-ink">x-api-key</code> header.
       </p>
 
       {newRawKey && (
-        <div className="rounded border border-amber-400 bg-amber-50 p-4 text-sm">
-          <p className="mb-2 font-medium">
-            Copy this now — it won&apos;t be shown again:
-          </p>
-          <code className="break-all">{newRawKey}</code>
+        <div className="border border-accent px-4 py-3 text-sm">
+          <p className="mb-2 font-medium">Copy this now — it won&apos;t be shown again:</p>
+          <code className="break-all font-mono text-accent">{newRawKey}</code>
         </div>
       )}
 
-      <form onSubmit={handleGenerate} className="flex gap-2">
+      <form onSubmit={handleGenerate} className="flex gap-2 border-b border-line pb-6">
         <input
           type="text"
           placeholder="Label (e.g. Claude Code)"
           value={label}
           onChange={(e) => setLabel(e.target.value)}
-          className="flex-1 rounded border px-3 py-2"
+          className="flex-1 border-b border-line bg-transparent py-2 outline-none placeholder:text-ink-dim focus:border-accent"
         />
         <button
           type="submit"
           disabled={loading}
-          className="rounded bg-black px-3 py-2 text-white disabled:opacity-50"
+          className="shrink-0 rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-ink disabled:opacity-50"
         >
           Generate
         </button>
       </form>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-accent">{error}</p>}
 
-      <ul className="flex flex-col gap-2">
+      <ul className="flex flex-col">
         {keys.map((k) => (
-          <li
-            key={k.id}
-            className="flex items-center justify-between rounded border px-3 py-2 text-sm"
-          >
+          <li key={k.id} className="flex items-center justify-between border-b border-line py-3 text-sm">
             <div>
-              <p className="font-medium">{k.label || "(unlabeled)"}</p>
-              <p className="text-neutral-500">
+              <p>{k.label || "(unlabeled)"}</p>
+              <p className="font-mono text-[11px] text-ink-dim">
                 created {new Date(k.created_at).toLocaleDateString()} · last used{" "}
                 {k.last_used_at ? new Date(k.last_used_at).toLocaleDateString() : "never"}
               </p>
             </div>
-            <button
-              onClick={() => handleRevoke(k.id)}
-              className="text-red-600 hover:underline"
-            >
-              Revoke
+            <button onClick={() => handleRevoke(k.id)} className="font-mono text-xs text-accent hover:underline">
+              revoke
             </button>
           </li>
         ))}
-        {keys.length === 0 && <p className="text-sm text-neutral-500">No keys yet.</p>}
+        {keys.length === 0 && <p className="py-4 text-sm text-ink-dim">No keys yet.</p>}
       </ul>
     </main>
   );

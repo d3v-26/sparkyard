@@ -33,7 +33,7 @@ export default function LoginPage() {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-4">
-      <h1 className="text-2xl font-semibold">Sign in</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Sparkyard</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           type="email"
@@ -41,7 +41,7 @@ export default function LoginPage() {
           placeholder="you@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="rounded border px-3 py-2"
+          className="border-b border-line bg-transparent py-2 outline-none placeholder:text-ink-dim focus:border-accent"
         />
         <input
           type="password"
@@ -49,18 +49,18 @@ export default function LoginPage() {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="rounded border px-3 py-2"
+          className="border-b border-line bg-transparent py-2 outline-none placeholder:text-ink-dim focus:border-accent"
         />
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm text-accent">{error}</p>}
         <button
           type="submit"
           disabled={loading}
-          className="rounded bg-black px-3 py-2 text-white disabled:opacity-50"
+          className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-ink disabled:opacity-50"
         >
           {loading ? "Signing in…" : "Sign in"}
         </button>
       </form>
-      <p className="text-sm text-neutral-500">
+      <p className="font-mono text-xs text-ink-dim">
         Invite-only. If you don&apos;t have an account, ask whoever runs this
         board to invite you.
       </p>

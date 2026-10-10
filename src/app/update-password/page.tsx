@@ -42,13 +42,13 @@ export default function UpdatePasswordPage() {
           placeholder="New password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="rounded border px-3 py-2"
+          className="border-b border-line bg-transparent py-2 outline-none placeholder:text-ink-dim focus:border-accent"
         />
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm text-accent">{error}</p>}
         <button
           type="submit"
           disabled={loading}
-          className="rounded bg-black px-3 py-2 text-white disabled:opacity-50"
+          className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-ink disabled:opacity-50"
         >
           {loading ? "Saving…" : "Save password"}
         </button>
