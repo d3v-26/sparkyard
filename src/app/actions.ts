@@ -4,6 +4,16 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
+// Top-level routes that a project slug must not shadow.
+const RESERVED_SLUGS = new Set([
+  "admin",
+  "api",
+  "auth",
+  "login",
+  "settings",
+  "update-password",
+]);
+
 function slugify(name: string) {
   return name
     .toLowerCase()
@@ -23,6 +33,7 @@ export async function createProject(formData: FormData) {
   if (!user) return;
 
   const slug = slugify(name);
+  if (!slug || RESERVED_SLUGS.has(slug)) return;
   const { error } = await supabase
     .from("projects")
     .insert({ name, slug, created_by: user.id });

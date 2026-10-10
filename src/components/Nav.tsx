@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { isAdminEmail } from "@/lib/admin";
 import { SignOutButton } from "./SignOutButton";
 
 export function Nav({ email }: { email: string | null }) {
@@ -12,6 +13,11 @@ export function Nav({ email }: { email: string | null }) {
           <Link href="/settings/api-keys" className="text-ink-dim hover:text-ink">
             api keys
           </Link>
+          {isAdminEmail(email) && (
+            <Link href="/admin" className="text-ink-dim hover:text-ink">
+              admin
+            </Link>
+          )}
           {email && <span className="text-ink-dim">{email}</span>}
           <SignOutButton />
         </nav>
