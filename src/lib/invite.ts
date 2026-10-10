@@ -1,3 +1,4 @@
+import { getSiteUrl } from "@/lib/site-url";
 import { createAdminClient } from "./supabase/admin";
 
 // Shared by scripts/invite-friend.ts and the /admin server actions.
@@ -9,7 +10,7 @@ export async function generateInviteLink(
   displayName?: string,
 ): Promise<{ link: string } | { error: string }> {
   const supabase = createAdminClient();
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const siteUrl = getSiteUrl();
   const redirectTo = `${siteUrl}/auth/confirm`;
 
   let { data, error } = await supabase.auth.admin.generateLink({

@@ -1,3 +1,4 @@
+import { getSiteUrl } from "@/lib/site-url";
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { hashApiKey } from "@/lib/api-key";
@@ -99,7 +100,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const siteUrl = getSiteUrl();
   return NextResponse.json(
     { id: idea.id, project: project.slug, url: `${siteUrl}/${project.slug}/ideas/${idea.id}` },
     { status: 201 },
