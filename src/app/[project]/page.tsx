@@ -48,7 +48,7 @@ export default async function ProjectBoard({
 
   const { data: project } = await supabase
     .from("projects")
-    .select("id, name, slug")
+    .select("id, name, slug, description")
     .eq("slug", slug)
     .maybeSingle();
   if (!project) notFound();
@@ -90,6 +90,9 @@ export default async function ProjectBoard({
               ← all projects
             </Link>
             <h1 className="text-2xl font-semibold tracking-tight">{project.name}</h1>
+            {project.description && (
+              <p className="mt-1 text-sm text-ink-dim">{project.description}</p>
+            )}
           </div>
           <p className="font-mono text-xs text-ink-dim">
             {filtered.length} of {ideas.length} idea{ideas.length === 1 ? "" : "s"}

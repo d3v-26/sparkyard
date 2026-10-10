@@ -32,11 +32,13 @@ export async function createProject(formData: FormData) {
   } = await supabase.auth.getUser();
   if (!user) return;
 
+  const description = String(formData.get("description") ?? "").trim();
+
   const slug = slugify(name);
   if (!slug || RESERVED_SLUGS.has(slug)) return;
   const { error } = await supabase
     .from("projects")
-    .insert({ name, slug, created_by: user.id });
+    .insert({ name, slug, description: description || null, created_by: user.id });
 
   if (!error) {
     revalidatePath("/");

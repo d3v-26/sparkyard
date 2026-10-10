@@ -24,7 +24,7 @@ export default async function Home() {
   if (!user) redirect("/login");
 
   const [{ data: projects }, { data: ideas }] = await Promise.all([
-    supabase.from("projects").select("id, name, slug, created_at").order("name"),
+    supabase.from("projects").select("id, name, slug, description, created_at").order("name"),
     supabase.from("ideas").select("project_id, created_at"),
   ]);
 
@@ -49,21 +49,30 @@ export default async function Home() {
 
         <form
           action={createProject}
-          className="flex gap-2 border-b border-line pb-8"
+          className="flex flex-col gap-2 border-b border-line pb-8"
         >
           <input
             type="text"
             name="name"
             required
             placeholder="Start a new project…"
-            className="flex-1 border-b border-line bg-transparent py-2 outline-none placeholder:text-ink-dim focus:border-accent"
+            className="border-b border-line bg-transparent py-2 outline-none placeholder:text-ink-dim focus:border-accent"
           />
-          <button
-            type="submit"
-            className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-ink"
-          >
-            Create
-          </button>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              name="description"
+              maxLength={140}
+              placeholder="One-line description (optional)"
+              className="flex-1 border-b border-line bg-transparent py-1.5 text-sm outline-none placeholder:text-ink-dim focus:border-accent"
+            />
+            <button
+              type="submit"
+              className="shrink-0 rounded-full bg-accent px-4 py-1.5 text-sm font-medium text-accent-ink"
+            >
+              Create
+            </button>
+          </div>
         </form>
 
         <ul className="flex flex-col">
@@ -75,7 +84,12 @@ export default async function Home() {
                   href={`/${p.slug}`}
                   className="flex items-center justify-between gap-4 py-4 hover:text-accent"
                 >
-                  <span className="text-lg">{p.name}</span>
+                  <span className="min-w-0">
+                    <span className="block text-lg">{p.name}</span>
+                    {p.description && (
+                      <span className="block truncate text-sm text-ink-dim">{p.description}</span>
+                    )}
+                  </span>
                   <span className="flex shrink-0 items-center gap-4 font-mono text-xs text-ink-dim">
                     <span>
                       {s?.count ?? 0} idea{s?.count === 1 ? "" : "s"}

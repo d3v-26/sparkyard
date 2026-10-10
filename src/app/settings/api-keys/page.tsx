@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 
 type ApiKey = {
@@ -10,7 +10,92 @@ type ApiKey = {
   last_used_at: string | null;
 };
 
+const noopSubscribe = () => () => {};
+
+function useOrigin() {
+  return useSyncExternalStore(
+    noopSubscribe,
+    () => window.location.origin,
+    () => "https://your-sparkyard-url",
+  );
+}
+
+function CodeBlock({ label, code }: { label: string; code: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <div className="border border-line">
+      <div className="flex items-center justify-between border-b border-line px-3 py-1.5 font-mono text-[11px] text-ink-dim">
+        <span>{label}</span>
+        <button
+          type="button"
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(code);
+              setCopied(true);
+              setTimeout(() => setCopied(false), 1500);
+            } catch {}
+          }}
+          className="hover:text-accent"
+        >
+          {copied ? "copied" : "copy"}
+        </button>
+      </div>
+      <pre className="overflow-x-auto px-3 py-3 font-mono text-xs leading-relaxed">{code}</pre>
+    </div>
+  );
+}
+
+function snippets(origin: string, key: string) {
+  const url = `${origin}/api/ideas`;
+  const json = `{"project":"PROJECT_SLUG","title":"Your idea","body":"Optional details","tags":["tag"]}`;
+  return [
+    {
+      label: "curl",
+      code: `curl -X POST ${url} \\
+  -H "x-api-key: ${key}" \\
+  -H "Content-Type: application/json" \\
+  -d '${json}'`,
+    },
+    {
+      label: "wget",
+      code: `wget -qO- --header="x-api-key: ${key}" \\
+  --header="Content-Type: application/json" \\
+  --post-data='${json}' \\
+  ${url}`,
+    },
+    {
+      label: "fetch (Node / JS)",
+      code: `await fetch("${url}", {
+  method: "POST",
+  headers: { "x-api-key": "${key}", "Content-Type": "application/json" },
+  body: JSON.stringify({
+    project: "PROJECT_SLUG",
+    title: "Your idea",
+    body: "Optional details",
+    tags: ["tag"],
+  }),
+}).then((r) => r.json());`,
+    },
+    {
+      label: "Python (requests)",
+      code: `import requests
+
+requests.post(
+    "${url}",
+    headers={"x-api-key": "${key}"},
+    json={
+        "project": "PROJECT_SLUG",
+        "title": "Your idea",
+        "body": "Optional details",
+        "tags": ["tag"],
+    },
+).json()`,
+    },
+  ];
+}
+
 export default function ApiKeysPage() {
+  const origin = useOrigin();
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [label, setLabel] = useState("");
   const [newRawKey, setNewRawKey] = useState<string | null>(null);
@@ -71,6 +156,17 @@ export default function ApiKeysPage() {
         <code className="font-mono text-ink">POST /api/ideas</code> with an{" "}
         <code className="font-mono text-ink">x-api-key</code> header.
       </p>
+
+      <div className="flex flex-col gap-3">
+        <p className="text-sm text-ink-dim">
+          Replace <code className="font-mono text-ink">PROJECT_SLUG</code> with a project&apos;s
+          URL name (the part after the site address, e.g. <code className="font-mono text-ink">sparkyard</code>).
+          {!newRawKey && " Generate a key below and it will be filled into these snippets."}
+        </p>
+        {snippets(origin, newRawKey ?? "YOUR_API_KEY").map((sn) => (
+          <CodeBlock key={sn.label} label={sn.label} code={sn.code} />
+        ))}
+      </div>
 
       {newRawKey && (
         <div className="border border-accent px-4 py-3 text-sm">
